@@ -2,8 +2,6 @@ package gui.help.about;
 
 import gui.help.updates.Updates;
 
-import java.awt.BorderLayout;
-
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
