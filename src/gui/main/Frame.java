@@ -1,9 +1,6 @@
 package gui.main;
 
-import gui.help.updates.Updates;
-
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class Frame extends JFrame {
 	

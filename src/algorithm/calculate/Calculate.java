@@ -1,17 +1,30 @@
 package algorithm.calculate;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 public class Calculate {
 	
 	private char[] chararray0;
-	private LinkedList<String> x0 = new LinkedList<>();
-	private LinkedList<String> x1 = new LinkedList<>();  //识别char[]原始数据
-	private LinkedList<String> x2 = new LinkedList<>();  //插入括号后的原始数据
+	private LinkedList<String> x0 = new LinkedList<>();  //一直在运行的linkedlist
+	private ArrayList<String> x1 = new ArrayList<>();  //识别char[]原始数据
+	private ArrayList<String> x2 = new ArrayList<>();  //插入括号后的原始数据
+	public static TreeMap<String,Integer> map = new TreeMap<>();
+//	private String[] words = {"+","-","*","/","^"};
 //	private LinkedList<Integer> x3 = new LinkedList<>();  //cal方法 放入"("位置指针
 //	private LinkedList<Integer> x4 = new LinkedList<>();  //自动增加括号方法 放入"("位置指针
 //	private LinkedList<Integer> x5 = new LinkedList<>();  //自动增加括号方法 放入")"位置指针
-	private double result;
+	private double result;  //结果
+	
+	static
+	{
+		map.put("+", 20);
+		map.put("-", 20);
+		map.put("*", 40);
+		map.put("/", 40);
+		map.put("^", 60);
+	}
 	
 	public Calculate()
 	{
@@ -33,6 +46,9 @@ public class Calculate {
 		x2.addAll(x0);  //x2为增加括号后的数据
 		cal();
 		dealResult();
+		System.out.println("");
+		getall();
+		System.out.println("-----");
 	}
 	
 	private void dealResult()
@@ -51,10 +67,10 @@ public class Calculate {
 		}
 	}
 	
-	private void putlinkedlist()
+	private void putlinkedlist()  //识别x1中的元素并放入到x0中
 	{
 		String temp0 = "";
-		for(int i=0;i<chararray0.length;i++)  //识别char[]里的每个元素,并放入LinkedList x0
+		for(int i=0;i<chararray0.length;i++)  //识别char[] chararray0里的每个元素,并放入LinkedList x0
 		{
 			switch(chararray0[i])  //
 			{
@@ -157,17 +173,25 @@ public class Calculate {
 	}
 	
 	/**
-	 *        
      *      j i j  
      * 3*2+1/2^3-2
-     *
+     *i为当前运算符,j为检测到的运算符
      */
 	private void addparenthesis_a()  //增加圆括号,此方法只能判断 传入的LinkedList<String> x0无任何括号
 	{
 		I:
 		for(int i=0;i<x0.size();i++)
 		{
-			if(getWeight(x0.get(i))>0)  //查询是否是运算符,并且大于30(大于+,-优先级)
+			try
+			{
+				boolean trymap = map.get(x0.get(i))>0;
+			}
+			catch(Exception e)
+			{
+				continue I;
+			}
+			if((map.get(x0.get(i)))>0)
+//			if(getWeight(x0.get(i))>0)  //查询是否是运算符,并且大于30(大于+,-优先级)
 			{
 				B:
 				for(int j=i;j>=0;j--)  //向前插入括号
@@ -259,7 +283,16 @@ public class Calculate {
 		I:
 		for(int i=0;i<x0.size();i++)
 		{
-			if(getWeight(x0.get(i))>30)  //查询是否是运算符,并且大于30(大于+,-优先级)
+			try
+			{
+				boolean trymap = map.get(x0.get(i))>0;
+			}
+			catch(Exception e)
+			{
+				continue I;
+			}
+			if((map.get(x0.get(i)))>30)
+//			if(getWeight(x0.get(i))>30)  //查询是否是运算符,并且大于30(大于+,-优先级)
 			{
 				B:
 				for(int j=i;j>=0;j--)  //向前插入括号
@@ -389,8 +422,9 @@ public class Calculate {
 	
 	private void cal()  //检测括号位置并传入到运算方法计算
 	{
-		LinkedList<Integer> x3 = new LinkedList<>();  //检测括号位置 放入"("位置指针
+		LinkedList<Integer> x3 = new LinkedList<>();  //检测括号位置并放入"("所在位置的地址
 		System.out.println(x1);
+		System.out.println(x2);
 //		System.out.println(x0);
 //		int a0 = 0;  //指针a0
 //		int a1 = 1;  //查询到"("为1次
@@ -412,15 +446,15 @@ public class Calculate {
 //					System.out.println(temp2+"!!!");
 //					temp2 = temp2 + x0.get(j);
 				}
-				String temp1 = calculate(temp2); //temp1为 ( ... ) 运算结果
+				String temp1 = calculate(temp2); //temp1为 (...) 运算结果
 //				temp2.clear();
 				for(int j=i;j>tempa;j--)  //填充占位符
 				{
 //					if(!x0.get(j).equals("@"))
 //					{
-//						x0.set(j, "@");  //占位符,将( ... )用 " "填充
+//						x0.set(j, "@");  //占位符,将(...)用 " "填充
 //					}
-					x0.set(j, "@");  //占位符,将( ... )用 " "填充
+					x0.set(j, "@");  //占位符,将(...)用 " "填充
 				}
 				x0.set(tempa, temp1);  //将运算结果填充到"("
 				x3.pollLast();
@@ -440,9 +474,9 @@ public class Calculate {
 //			System.out.println(x);
 			if(x.get(i).equals("+"))
 			{
-				double a = 0;
-				double b = 0;
-				double r = 0;
+				double a = 0;  //运算符前一个数字
+				double b = 0;  //运算符后一个数字
+				double r = 0;  //运算结果
 				int j1 = 0;
 				int j2 = x.size()-1;
 				for(int j=i-1;j!=-1;j--)
@@ -464,7 +498,7 @@ public class Calculate {
 						break;
 					}
 				}
-				r = a + b;
+				r = a + b;  //此处不同
 				for(int j=j2;j>j1;j--)
 				{
 					x.set(j, "@");  //插入占位符@
@@ -497,7 +531,7 @@ public class Calculate {
 						break;
 					}
 				}
-				r = a - b;
+				r = a - b;  //此处不同
 				for(int j=j2;j>j1;j--)
 				{
 					x.set(j, "@");  //插入占位符@
@@ -605,41 +639,41 @@ public class Calculate {
 				}
 				x.set(j1, String.valueOf(r));
 			}
-			else if(x.get(i).equals("!"))  //log
-			{
-				double a = 1;
-				double b = 1;
-				double r = 1;
-				int j1 = 0;
-				int j2 = x.size()-1;
-				for(int j=i-1;j!=-1;j--)
-				{
-//					System.out.println(j);
-					if(isNumber(x.get(j)))
-					{
-						j1 = j;
-						a = Double.valueOf(x.get(j));
-						break;
-					}
-				}
-				for(int j=i+1;j!=-1;j++)
-				{
-					if(isNumber(x.get(j)))
-					{
-						j2 = j;
-						b = Double.valueOf(x.get(j));
-						break;
-					}
-				}
-				r = Math.pow(a, b);
-				for(int j=j2;j>j1;j--)
-				{
-					x.set(j, "@");  //插入占位符@
-//					System.out.println("@");
-//					System.out.println(x);
-				}
-				x.set(j1, String.valueOf(r));
-			}
+//			else if(x.get(i).equals("!"))  //log
+//			{
+//				double a = 1;
+//				double b = 1;
+//				double r = 1;
+//				int j1 = 0;
+//				int j2 = x.size()-1;
+//				for(int j=i-1;j!=-1;j--)
+//				{
+////					System.out.println(j);
+//					if(isNumber(x.get(j)))
+//					{
+//						j1 = j;
+//						a = Double.valueOf(x.get(j));
+//						break;
+//					}
+//				}
+//				for(int j=i+1;j!=-1;j++)
+//				{
+//					if(isNumber(x.get(j)))
+//					{
+//						j2 = j;
+//						b = Double.valueOf(x.get(j));
+//						break;
+//					}
+//				}
+//				r = Math.pow(a, b);
+//				for(int j=j2;j>j1;j--)
+//				{
+//					x.set(j, "@");  //插入占位符@
+////					System.out.println("@");
+////					System.out.println(x);
+//				}
+//				x.set(j1, String.valueOf(r));
+//			}
 			else
 			{
 				

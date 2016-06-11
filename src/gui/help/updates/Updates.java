@@ -55,33 +55,41 @@ public class Updates extends JPanel {
 		
 		JButton button = new JButton();
 		button.setText("检查更新");
+		
 		button.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				try{
-					URL url = new URL("https://github.com/102400/JSQ1/raw/master/changelog.txt");  //changelog.txt地址
-					URLConnection conn = url.openConnection();
-					BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-					latest = reader.readLine();
-					latest = latest + "\n" + reader.readLine();
-					label1.setText("最新版本:"+latest);
-					String line;
-					StringBuilder temp = new StringBuilder();
-					temp.append(latest+"\n");
-					while((line = reader.readLine()) !=null)
-					{
-						temp.append(line+"\n");
+				Thread t = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						try{
+							URL url = new URL("https://github.com/102400/JSQ1/raw/master/changelog.txt");  //changelog.txt地址
+							URLConnection conn = url.openConnection();
+							BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+							latest = reader.readLine();
+							latest = latest + "\n" + reader.readLine();
+							label1.setText("最新版本:"+latest);
+							String line;
+							StringBuilder temp = new StringBuilder();
+							temp.append(latest+"\n");
+							while((line = reader.readLine()) !=null)
+							{
+								temp.append(line+"\n");
+							}
+							temp.append("\n下载地址:https://github.com/102400/JSQ1/archive/master.zip");
+							textArea.setText(new String(temp.toString()));
+							reader.close();
+						}
+						catch(Exception ex)
+						{
+							ex.printStackTrace();
+						}
 					}
-					temp.append("\n下载地址:https://github.com/102400/JSQ1/archive/master.zip");
-					textArea.setText(new String(temp.toString()));
-					reader.close();
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
+				});
+				t.start();
 			}
 		});
 		add(button);
